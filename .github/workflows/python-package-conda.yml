@@ -1,0 +1,122 @@
+import os
+import ast
+
+def cargar_datos():
+    """Carga los datos de facturas pendientes y pagadas desde archivos."""
+    pendientes, pagadas={},{}
+    if os.path.exists("facturas_pendientes.txt"):
+        with open ("facturas_pendientes.txt", "r") as archivo:
+            contenido=archivo.read()
+            if contenido:
+                pendientes= ast.literal_eval(contenido)
+    if os.path.exists("facturas_pagadas.txt"):
+        with open ("facturas_pagadas.txt", "r") as archivo:
+            contenido=archivo.read()
+            if contenido:
+                pagadas=ast.literal_eval(contenido)
+    return pendientes,pagadas
+
+def guardar_datos(pendientes, pagadas):
+    """Guardar los datos de facturas pendientes y pagadas en archivos."""
+    with open("facturas_pendientes.txt", "w") as archivo:
+        archivo.write(str(pendientes))
+    with open ("facturas_pagadas.txt", "w") as archivo:
+        archivo.write(str(pagadas))
+
+def agregar_factura(pendientes, pagadas):
+    """Añade una nueva factura pendiente."""
+    numero = input("Ingrese el numero de factura: ")
+    if numero in pendientes:
+        print("Ya existe una una factura con ese numero.")
+        return
+    if numero in pagadas:
+        print("No se puede agregar una factura que ya ha sido pagada.")
+        return
+    try:
+        costo = float(input("Ingrese el costo de la factura: "))
+        if costo <=0:
+            raise ValueError("El costo debe ser mayor a cero.")
+        nombre = input("Ingrese el nombre del deudor: ")
+        pendientes[numero] = {"costo": costo, "deudor": nombre}
+        print("Factura añadida correctamente.")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+def modificar_factura(pendientes):
+    """Modifica los datos de una factura pendiente."""
+    if not pendientes:
+        print("No hay facturas pendientes para modificar.")
+        return
+    numero=input("ingrese el numero de la factura a modificar: ")
+    if numero not in pendientes:
+        print("La factura no existe en las pendientes: ")
+        return
+    try:
+        nuevo_costo=float(input("ingrese el nuevo costo de la factura: "))
+        if nuevo_costo<=0:
+            raise ValueError("El costo debe ser mayor a cero:")
+        nuevo_deudor=input("ingrese el nuevo nombre del deudor: ")
+        pendientes[numero]={"costo": nuevo_costo, "deudor": nuevo_deudor}
+        print("Factura modificada correctamente.")
+    except ValueError as e:
+        print(f"Error:{e}")
+
+def pagar_factura(pendientes, pagadas):
+    """Registra el pago de una factura."""
+    if not pendientes:
+        print("No hay facturas pendientes para pagar.")
+        return
+    numero = input("Ingrese el numero de la factura a pagar")
+    if numero not in pendientes:
+        print("La factura no existe en las pendientes.")
+        return
+    factura = pendientes.pop(numero)
+    pagadas[numero] = factura
+    print("Factura pagada y movida al registro de facturas pagadas")
+    
+def menu():
+    """Menu principal del programa."""
+    pendientes,pagadas=cargar_datos()
+
+    while True:
+        print("\nMenu de gestion de Facturas")
+        print("1.Agregar factura pendiente")
+        print("2.Modificar factura pendiente")
+        print("3.Pagar factura")
+        print("4.Consultar facturas pendientes")
+        print("5.Consultar facturas pagadas")
+        print("6.Eliminar factura pendiente")
+        print("7.Mostrar totales")
+        print("8:Eliminar todos los datos")
+        print("9.Salir")
+
+        opcion = input("Seleccione una opcion: ")
+
+        if opcion == "1":
+            agregar_factura(pendientes, pagadas)
+        elif opcion == "2":
+            modificar_factura(pendientes)
+        elif opcion == "3":
+            pegar_factura(pendientes, pagadas)
+        elif opcion == "4":
+            consultar_facturas(pendientes, "pendientes")
+        elif opcion == "5":
+            consultar_facturas(pagadas, "pagadas")
+        elif opcion == "6":
+            eliminar_factura(pendientes)
+        elif opcion == "7":
+            mostrar_totales(pendientes, págadas)
+        elif opcion == "8":
+            eliminar_todo(pendientes, pagadas)
+        elif opcion == "9":
+            guardar_datos(pendientes, pagadas)
+            print("Diccionario con informacion guardado. Saliendo del programa.")
+            break
+        else:
+            print("Opcion no valida. Intente de nuevo.")
+
+# programa principal
+menu()
+
+#Salida del programa
+print("\n PROGRAMADORES: Eduardo, Eder")
